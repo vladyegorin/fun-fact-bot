@@ -11,6 +11,7 @@ import java.util.Properties;
 
 public class Bot extends TelegramLongPollingBot {
     private String botToken;
+
     public Bot() {
         // Load properties from config file
         Properties properties = new Properties();
