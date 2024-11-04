@@ -4,7 +4,24 @@ import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 public class Bot extends TelegramLongPollingBot {
+    private String botToken;
+    public Bot() {
+        // Load properties from config file
+        Properties properties = new Properties();
+        try (FileInputStream fis = new FileInputStream("config.properties")) {
+            properties.load(fis);
+            botToken = properties.getProperty("TELEGRAM_BOT_TOKEN");
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the error, maybe set a default or exit
+        }
+    }
 
     @Override
     public String getBotUsername() {
@@ -13,7 +30,7 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return "7967188244:AAFOVGFpgUceE8qz5SeoH7aB43QGGJDkZ3s";
+        return botToken;
     }
 
     @Override

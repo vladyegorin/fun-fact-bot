@@ -21,6 +21,8 @@ target/
 .springBeans
 .sts4-cache
 
+#config containing bot token
+config.properties
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
