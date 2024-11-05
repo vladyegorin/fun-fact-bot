@@ -46,34 +46,40 @@ public class Bot extends TelegramLongPollingBot {
 
         if (msg.hasText()) {
             System.out.println("Text message: " + msg.getText());
-        } else if (msg.hasSticker()) {
+        }
+        else if (msg.hasSticker()) {
             System.out.println("Sticker received");
-        } else if (msg.hasPhoto()) {
+        }
+        else if (msg.hasPhoto()) {
             System.out.println("Photo received");
-        } else if (msg.hasVoice()) {
+        }
+        else if (msg.hasVoice()) {
             System.out.println("Voice received");
-
-        }else if (msg.hasAudio()) {
+        }
+        else if (msg.hasAudio()) {
             System.out.println("Audio received");
-
         }
         else if (msg.hasVideoNote()) {
             System.out.println("Kruzhok received");
-
-        }else if (msg.hasDocument()) {
+        }
+        else if (msg.hasDocument()) {
             System.out.println("Document received");
-        } else if (msg.hasVideo()) {
+        }
+        else if (msg.hasVideo()) {
             System.out.println("Video received");
-        } else if (msg.hasAnimation()) {
+        }
+        else if (msg.hasAnimation()) {
             System.out.println("GIF received");
-        } else {
+        }
+        else {
             System.out.println("Unknown message type");
         }
 
         if(msg.hasText()) {
             if (msg.getText().equals("Я тебя люблю")) {
                 sendText(id, "И я тебя люблю бубуня");
-            } else {
+            }
+            else {
                 copyMessage(id, msg.getMessageId());
             }
         }
