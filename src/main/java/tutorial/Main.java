@@ -10,6 +10,6 @@ public class Main {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         Bot bot = new Bot();
         botsApi.registerBot(new Bot());
-        //bot.sendText(5256184826L, "БЭЭЭЭЭЭээээээээээээээ");
+        //bot.sendText(5256184826L, "Hello!");
     }
 }

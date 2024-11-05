@@ -40,7 +40,7 @@ public class Bot extends TelegramLongPollingBot {
         var user = msg.getFrom();
         var id = user.getId();
         System.out.println("New message!");
-        //System.out.println(update); -> prints all the info about the message
+        //System.out.println(update);// -> prints all the info about the message
         System.out.println("User ID: " + id);
         System.out.println("Username: " + user.getUserName());
 
