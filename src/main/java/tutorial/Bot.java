@@ -97,17 +97,11 @@ public class Bot extends TelegramLongPollingBot {
 
         }
         else if(msg.hasText() & msg.getText().equals("/help")) {
-            sendText(id,"Welcome to Fun Fact Bot!\nYou can ask me for a fun fact by typing      /fact.\n" +
-                    "If you don't want a fun fact, you can just try talking to me. Send me some pictures, kruzhochki, audio messages etc.");
-        }
-        else if(msg.hasText() & msg.getText().equals("/add")){
-            sendText(id,"Okay, give me a fun fact you would like me to add to the database of facts.");
-            //receives a fact in a string
-            //asks user: are you sure you would like this fact added. yes - added, no - break
-            // userAddFunFact(fact);
+            sendText(id, "Welcome to Fun Fact Bot!\nYou can ask me for a fun fact by typing      /fact.\n" +
+                    "If you don't want a fun fact, you can just send me something. Send me some pictures, kruzhochki, audio messages etc.");
         }
         else {
-            sendText(id, "I don't really understand. Try sending another message.");
+            sendText(id, "I don't really understand. Try sending another type of message or a command.");
         }
 
 
