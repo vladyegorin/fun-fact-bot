@@ -8,6 +8,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Random;
 
 public class Bot extends TelegramLongPollingBot {
     private String botToken;
@@ -86,6 +91,8 @@ public class Bot extends TelegramLongPollingBot {
 
         if(msg.hasText() & msg.getText().equals("/fact")) {
             //fact
+            String funfact = getRandomFunFact();
+            sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
 
 
         }
@@ -96,6 +103,22 @@ public class Bot extends TelegramLongPollingBot {
 
 
     }
+    private String getRandomFunFact(){
+        String funFact = "No fun fact available.";
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:facts.sqlite");
+             Statement stmt = conn.createStatement()) {
+
+            String sql = "SELECT fact FROM fun_facts ORDER BY RANDOM() LIMIT 1";
+            ResultSet rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                funFact = rs.getString("fact");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return funFact;
+    }
+
     public void copyMessage(Long who, Integer msgId){
         CopyMessage cm = CopyMessage.builder()
                 .fromChatId(who.toString())  //We copy from the user
