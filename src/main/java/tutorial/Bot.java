@@ -23,7 +23,8 @@ public class Bot extends TelegramLongPollingBot {
     private InlineKeyboardButton animal = InlineKeyboardButton.builder().text("Animal Fun Fact").callbackData("animal").build();
     private InlineKeyboardButton human = InlineKeyboardButton.builder().text("Human Fun Fact").callbackData("human").build();
     private InlineKeyboardButton plants = InlineKeyboardButton.builder().text("Plant Fun Fact").callbackData("plant").build();
-    private InlineKeyboardMarkup keyboardFactType = InlineKeyboardMarkup.builder().keyboardRow(List.of(animal)).keyboardRow(List.of(human)).keyboardRow(List.of(plants)).build();
+    private InlineKeyboardButton randomFF = InlineKeyboardButton.builder().text("Random Fun Fact").callbackData("random").build();
+    private InlineKeyboardMarkup keyboardFactType = InlineKeyboardMarkup.builder().keyboardRow(List.of(animal)).keyboardRow(List.of(human)).keyboardRow(List.of(plants)).keyboardRow(List.of(randomFF)).build();
 
 
     public Bot() {
@@ -97,26 +98,31 @@ public class Bot extends TelegramLongPollingBot {
             System.out.println("Unknown message type");
             sendText(id,"Unfortunately, I do not understand what you sent me :(");
         }
+        if(msg.hasText()) {
+            if (msg.getText().equals("/fact")) {
+                //fact
+                sendMenu(id, "<b>Which type of a fun fact would you like to get?</b>", keyboardFactType);
+                //see official tg guide
+                //if else construction depending on what button user chose:
+                //sendtext "Here is a fun " + "animal" OR "human" + funfact
+                //String funfact = getRandomFunFact();
+                //sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
 
-        if(msg.hasText() & msg.getText().equals("/fact")) {
-            //fact
-            sendMenu(id,"<b>Which type of a fun fact would you like to get?</b>",keyboardFactType);
 
-            //if else construction depending on what button user chose:
-            //sendtext "Here is a fun " + "animal" OR "human" + funfact
-            //String funfact = getRandomFunFact();
-            //sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
+            } else if (msg.getText().equals("/start")) {
+                sendText(id, "Welcome to Fun Fact Bot!\nAsk me for a fun fact by typing /fact\n" +
+                        "If you don't want a fun fact, send me some pictures, kruzhochki, voice messages, stickers etc.");
 
-
+            } else if (msg.getText().equals("/help")) {
+                sendText(id, "Use /fact and click on one of the buttons to choose which type of a fun fact you would like to get 😊");
+            } else if (msg.getText().equals("Hello") || msg.getText().equals("Hi") || msg.getText().equals("hello") || msg.getText().equals("hi")) {
+                sendText(id, "Hi there!");
+            } else if (msg.getText().equals("Привет") ||msg.getText().equals("привет")){
+                sendText(id,"Приветики!");
+            } else{
+                sendText(id, "I don't really understand. Try sending another type of message or a command.");
+            }
         }
-        else if(msg.hasText() & msg.getText().equals("/help")) {
-            sendText(id, "Welcome to Fun Fact Bot!\nYou can ask me for a fun fact by typing      /fact.\n" +
-                    "If you don't want a fun fact, you can just send me something. Send me some pictures, kruzhochki, audio messages etc.");
-        }
-        else {
-            sendText(id, "I don't really understand. Try sending another type of message or a command.");
-        }
-
 
 
 
