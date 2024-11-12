@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class Bot extends TelegramLongPollingBot {
     private String botToken;
-
+    private String state;
     public Bot() {
         // Load properties from config file
         Properties properties = new Properties();
@@ -100,28 +100,60 @@ public class Bot extends TelegramLongPollingBot {
             sendText(id,"Welcome to Fun Fact Bot!\nYou can ask me for a fun fact by typing      /fact.\n" +
                     "If you don't want a fun fact, you can just try talking to me. Send me some pictures, kruzhochki, audio messages etc.");
         }
+        else if(msg.hasText() & msg.getText().equals("/add")){
+            sendText(id,"Okay, give me a fun fact you would like me to add to the database of facts.");
+            //receives a fact in a string
+            //asks user: are you sure you would like this fact added. yes - added, no - break
+            // userAddFunFact(fact);
+        }
         else {
-            sendText(id, "I do not quite understand. Try sending another message.");
+            sendText(id, "I don't really understand. Try sending another message.");
         }
 
 
 
+
     }
-    private String getRandomFunFact(){
+    private String getRandomFunFact() {
         String funFact = "No fun fact available.";
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:facts.sqlite");
              Statement stmt = conn.createStatement()) {
 
-            String sql = "SELECT fact FROM fun_facts ORDER BY RANDOM() LIMIT 1";
+
+            String countQuery = "SELECT COUNT(*) AS count FROM fun_facts WHERE shown = 0";
+            ResultSet countRs = stmt.executeQuery(countQuery);
+            int unshownCount = 0;
+            if (countRs.next()) {
+                unshownCount = countRs.getInt("count");
+            }
+
+            // If all facts have been shown, reset the `shown` column
+            if (unshownCount == 0) {
+                String resetQuery = "UPDATE fun_facts SET shown = 0";
+                stmt.executeUpdate(resetQuery);
+            }
+
+            // Select a random unshown fact
+            String sql = "SELECT fact FROM fun_facts WHERE shown = 0 ORDER BY RANDOM() LIMIT 1";
             ResultSet rs = stmt.executeQuery(sql);
             if (rs.next()) {
                 funFact = rs.getString("fact");
+
+                // Mark the fact as shown
+                String updateQuery = "UPDATE fun_facts SET shown = 1 WHERE fact = ?";
+                try (var pstmt = conn.prepareStatement(updateQuery)) {
+                    pstmt.setString(1, funFact);
+                    pstmt.executeUpdate();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return funFact;
     }
+    //private void userAddFunFact(String fact){
+
+    //}
 
     public void copyMessage(Long who, Integer msgId){
         CopyMessage cm = CopyMessage.builder()
