@@ -63,7 +63,7 @@ public class Bot extends TelegramLongPollingBot {
         }
         else if (msg.hasSticker()) {
             System.out.println("Sticker received");
-            sendText(id, "Cool sticker!");
+            sendText(id, "Nice sticker!");
         }
         else if (msg.hasPhoto()) {
             System.out.println("Photo received");
@@ -75,7 +75,7 @@ public class Bot extends TelegramLongPollingBot {
         }
         else if (msg.hasAudio()) {
             System.out.println("Audio received");
-            sendText(id, "Cool song!");
+            sendText(id, "Cool song! You rock!");
         }
         else if (msg.hasVideoNote()) {
             System.out.println("Kruzhok received");
@@ -83,11 +83,11 @@ public class Bot extends TelegramLongPollingBot {
         }
         else if (msg.hasDocument()) {
             System.out.println("Document received");
-            sendText(id, "Unfortunately, I cannot read a document.");
+            sendText(id, "Unfortunately, I cannot read a document, but I bet there is something cool in it.");
         }
         else if (msg.hasVideo()) {
             System.out.println("Video received");
-            sendText(id, "Cool video!");
+            sendText(id, "Amazing video!");
         }
         else if (msg.hasAnimation()) {
             System.out.println("GIF received");
@@ -101,8 +101,11 @@ public class Bot extends TelegramLongPollingBot {
         if(msg.hasText() & msg.getText().equals("/fact")) {
             //fact
             sendMenu(id,"<b>Which type of a fun fact would you like to get?</b>",keyboardFactType);
-            String funfact = getRandomFunFact();
-            sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
+
+            //if else construction depending on what button user chose:
+            //sendtext "Here is a fun " + "animal" OR "human" + funfact
+            //String funfact = getRandomFunFact();
+            //sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
 
 
         }
