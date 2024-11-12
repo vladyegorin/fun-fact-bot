@@ -3,10 +3,13 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +20,12 @@ import java.util.Random;
 public class Bot extends TelegramLongPollingBot {
     private String botToken;
     private String state;
+    private InlineKeyboardButton animal = InlineKeyboardButton.builder().text("Animal Fun Fact").callbackData("animal").build();
+    private InlineKeyboardButton human = InlineKeyboardButton.builder().text("Human Fun Fact").callbackData("human").build();
+    private InlineKeyboardButton plants = InlineKeyboardButton.builder().text("Plant Fun Fact").callbackData("plant").build();
+    private InlineKeyboardMarkup keyboardFactType = InlineKeyboardMarkup.builder().keyboardRow(List.of(animal)).keyboardRow(List.of(human)).keyboardRow(List.of(plants)).build();
+
+
     public Bot() {
         // Load properties from config file
         Properties properties = new Properties();
@@ -91,6 +100,7 @@ public class Bot extends TelegramLongPollingBot {
 
         if(msg.hasText() & msg.getText().equals("/fact")) {
             //fact
+            sendMenu(id,"<b>Which type of a fun fact would you like to get?</b>",keyboardFactType);
             String funfact = getRandomFunFact();
             sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
 
@@ -107,6 +117,17 @@ public class Bot extends TelegramLongPollingBot {
 
 
 
+    }
+    public void sendMenu(Long who, String txt, InlineKeyboardMarkup kb){
+        SendMessage sm = SendMessage.builder().chatId(who.toString())
+                .parseMode("HTML").text(txt)
+                .replyMarkup(kb).build();
+
+        try {
+            execute(sm);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
     private String getRandomFunFact() {
         String funFact = "No fun fact available.";
