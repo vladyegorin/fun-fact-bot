@@ -23,6 +23,9 @@ target/
 
 #config containing bot token
 config.properties
+
+#facts db
+facts.sqlite
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
