@@ -2,6 +2,7 @@ package tutorial;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 
 public class Bot extends TelegramLongPollingBot {
     private String botToken;
@@ -58,73 +58,81 @@ public class Bot extends TelegramLongPollingBot {
 
         if (msg.hasText()) {
             System.out.println("Text message: " + msg.getText());
+            handleTextMessages(msg,id);
         }
-        else if (msg.hasSticker()) {
-            System.out.println("Sticker received");
-            sendText(id, "Nice sticker!");
+        else{
+            handleMediaAndOtherMessages(msg, id);
         }
-        else if (msg.hasPhoto()) {
-            System.out.println("Photo received");
-            sendText(id, "Cool photo!");
-        }
-        else if (msg.hasVoice()) {
-            System.out.println("Voice received");
-            sendText(id, "You have a beautiful voice!");
-        }
-        else if (msg.hasAudio()) {
-            System.out.println("Audio received");
-            sendText(id, "Cool song! You rock!");
-        }
-        else if (msg.hasVideoNote()) {
-            System.out.println("Kruzhok received");
-            sendText(id, "You've got a pretty face!");
-        }
-        else if (msg.hasDocument()) {
-            System.out.println("Document received");
-            sendText(id, "Unfortunately, I cannot read a document, but I bet there is something cool in it.");
-        }
-        else if (msg.hasVideo()) {
-            System.out.println("Video received");
-            sendText(id, "Amazing video!");
-        }
-        else if (msg.hasAnimation()) {
-            System.out.println("GIF received");
-            sendText(id, "Nice GIF!");
-        }
-        else {
-            System.out.println("Unknown message type");
-            sendText(id,"Unfortunately, I do not understand what you sent me :(");
-        }
-        if(msg.hasText()) {
-            if (msg.getText().equals("/fact")) {
-                //fact
-                sendMenu(id, "<b>Which type of a fun fact would you like to get?</b>", keyboardFactType);
-                //see official tg guide
-                //1)remake the db,delete all old facts, add "type" column, populate with new facts with giving them a type
-                //2)remake getRandomFunFact function. make a variable that will take the "type" of the fact
-                //3)if type = random, give ANY fact(this means original getRandomFunFact would work)
-                //String funfact = getRandomFunFact();
-                //sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
-
-
-            } else if (msg.getText().equals("/start")) {
-                sendText(id, "Welcome to Fun Fact Bot!\nAsk me for a fun fact by typing /fact\n" +
-                        "If you don't want a fun fact, send me some pictures, kruzhochki, voice messages, stickers etc.");
-
-            } else if (msg.getText().equals("/help")) {
-                sendText(id, "Use /fact and click on one of the buttons to choose which type of a fun fact you would like to get 😊");
-            } else if (msg.getText().equals("Hello") || msg.getText().equals("Hi") || msg.getText().equals("hello") || msg.getText().equals("hi")) {
-                sendText(id, "Hi there!");
-            } else if (msg.getText().equals("Привет") ||msg.getText().equals("привет")){
-                sendText(id,"Приветики!");
-            } else{
-                sendText(id, "I don't really understand. Try sending another type of message or a command.");
-            }
+        if (update.hasCallbackQuery()) {
+            // Handle the button click
+            var callbackQuery = update.getCallbackQuery();
+            var userId = callbackQuery.getFrom().getId();
+            var data = callbackQuery.getData();
+            System.out.println("Callback query received");
+            String funFact = getRandomFunFact(data); // Get fact based on the clicked button
+            sendText(userId, "Here is your fun fact: \n" + funFact);
         }
 
 
 
     }
+    private void handleTextMessages(Message msg, Long id){
+        if (msg.getText().equals("/fact")) {
+            //fact
+            sendMenu(id, "<b>Which type of a fun fact would you like to get?</b>", keyboardFactType);
+            //see official tg guide
+            //1)remake the db,delete all old facts, add "type" column, populate with new facts with giving them a type
+            //2)remake getRandomFunFact function. make a variable that will take the "type" of the fact
+            //3)if type = random, give ANY fact(this means original getRandomFunFact would work)
+            //String funfact = getRandomFunFact();
+            //sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
+
+
+        } else if (msg.getText().equals("/start")) {
+            sendText(id, "Welcome to Fun Fact Bot!\nAsk me for a fun fact by typing /fact\n" +
+                    "If you don't want a fun fact, send me some pictures, kruzhochki, voice messages, stickers etc.");
+
+        } else if (msg.getText().equals("/help")) {
+            sendText(id, "Use /fact and click on one of the buttons to choose which type of a fun fact you would like to get 😊");
+        } else if (msg.getText().equals("Hello") || msg.getText().equals("Hi") || msg.getText().equals("hello") || msg.getText().equals("hi")) {
+            sendText(id, "Hi there!");
+        } else if (msg.getText().equals("Привет") ||msg.getText().equals("привет")){
+            sendText(id,"Приветики!");
+        } else{
+            sendText(id, "I don't really understand. Try sending another type of message or a command.");
+        }
+    }
+    private void handleMediaAndOtherMessages(Message msg, Long id) {
+        if (msg.hasSticker()) {
+            System.out.println("Sticker received");
+            sendText(id, "Cool sticker!");
+        } else if (msg.hasPhoto()) {
+            System.out.println("Photo received");
+            sendText(id, "Cool photo!");
+        } else if (msg.hasVoice()) {
+            System.out.println("Voice received");
+            sendText(id, "You have a beautiful voice!");
+        } else if (msg.hasAudio()) {
+            System.out.println("Audio received");
+            sendText(id, "Cool song!");
+        } else if (msg.hasVideoNote()) {
+            System.out.println("Kruzhok received");
+            sendText(id, "You've got a pretty face!");
+        } else if (msg.hasDocument()) {
+            System.out.println("Document received");
+            sendText(id, "Unfortunately, I cannot read a document.");
+        } else if (msg.hasVideo()) {
+            System.out.println("Video received");
+            sendText(id, "Cool video!");
+        } else if (msg.hasAnimation()) {
+            System.out.println("GIF received");
+            sendText(id, "Nice GIF!");
+        } else {
+            System.out.println("Unknown message type");
+            sendText(id, "Unfortunately, I do not understand what you sent me :(");
+        }
+    }
+
     public void sendMenu(Long who, String txt, InlineKeyboardMarkup kb){
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt)
