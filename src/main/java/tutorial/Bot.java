@@ -103,8 +103,9 @@ public class Bot extends TelegramLongPollingBot {
                 //fact
                 sendMenu(id, "<b>Which type of a fun fact would you like to get?</b>", keyboardFactType);
                 //see official tg guide
-                //if else construction depending on what button user chose:
-                //sendtext "Here is a fun " + "animal" OR "human" + funfact
+                //1)remake the db,delete all old facts, add "type" column, populate with new facts with giving them a type
+                //2)remake getRandomFunFact function. make a variable that will take the "type" of the fact
+                //3)if type = random, give ANY fact(this means original getRandomFunFact would work)
                 //String funfact = getRandomFunFact();
                 //sendText(id, "Sure! Here is a fun fact for you :\n" + funfact);
 
