@@ -71,6 +71,7 @@ public class Bot extends TelegramLongPollingBot {
             handleCallbackQuery(update.getCallbackQuery());
         }
     }
+
     private void handleCallbackQuery(CallbackQuery callbackQuery) {
         var userId = callbackQuery.getFrom().getId();
         var data = callbackQuery.getData();  // This is the callback data sent by button clicks
@@ -81,6 +82,7 @@ public class Bot extends TelegramLongPollingBot {
         String funFact = getRandomFunFact(data);
         sendText(userId, "Here is your " + data + " fun fact: \n" + funFact);
     }
+
     private void handleTextMessages(Message msg, Long id){
         if (msg.getText().equals("/fact")) {
             //fact
@@ -103,10 +105,15 @@ public class Bot extends TelegramLongPollingBot {
             sendText(id, "Hi there!");
         } else if (msg.getText().equals("Привет") ||msg.getText().equals("привет")){
             sendText(id,"Приветики!");
-        } else{
+        }
+        else if (msg.getText().equals("Thank you")){
+            sendText(id,"You are welcome!");
+        }
+        else{
             sendText(id, "I don't really understand. Try sending another type of message or a command.");
         }
     }
+
     private void handleMediaAndOtherMessages(Message msg, Long id) {
         if (msg.hasSticker()) {
             System.out.println("Sticker received");
@@ -136,6 +143,7 @@ public class Bot extends TelegramLongPollingBot {
             System.out.println("Unknown message type");
             sendText(id, "Unfortunately, I do not understand what you sent me :(");
         }
+
     }
 
     public void sendMenu(Long who, String txt, InlineKeyboardMarkup kb){
@@ -149,6 +157,7 @@ public class Bot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
+
     private String getRandomFunFact(String factType) {
         String funFact = "No fun fact available.";
         String sql;
@@ -205,7 +214,7 @@ public class Bot extends TelegramLongPollingBot {
         return funFact;
     }
 
-    //}
+
 
     public void copyMessage(Long who, Integer msgId){
         CopyMessage cm = CopyMessage.builder()
@@ -219,6 +228,7 @@ public class Bot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
+
     public void sendText(Long who, String what){
         SendMessage sm = SendMessage.builder()
                 .chatId(who.toString()) //Who are we sending a message to
