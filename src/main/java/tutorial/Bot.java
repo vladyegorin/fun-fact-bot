@@ -2,6 +2,7 @@ package tutorial;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -48,33 +49,37 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        var msg = update.getMessage();
-        var user = msg.getFrom();
-        var id = user.getId();
-        System.out.println("New message!");
-        //System.out.println(update);// -> prints all the info about the message
-        System.out.println("User ID: " + id);
-        System.out.println("Username: " + user.getUserName());
+        if (update.hasMessage()) {
+            var msg = update.getMessage();
+            var user = msg.getFrom();
+            var id = user.getId();
 
-        if (msg.hasText()) {
-            System.out.println("Text message: " + msg.getText());
-            handleTextMessages(msg,id);
+            System.out.println("\nNew message!");
+            System.out.println("User ID: " + id);
+            System.out.println("Username: " + user.getUserName());
+
+            if (msg.hasText()) {
+                System.out.println("Text message: " + msg.getText());
+                handleTextMessages(msg, id); // Calls the function to handle text messages
+            } else {
+                handleMediaAndOtherMessages(msg, id); // Calls the function to handle media or other types of messages
+            }
         }
-        else{
-            handleMediaAndOtherMessages(msg, id);
-        }
+
         if (update.hasCallbackQuery()) {
-            // Handle the button click
-            var callbackQuery = update.getCallbackQuery();
-            var userId = callbackQuery.getFrom().getId();
-            var data = callbackQuery.getData();
-            System.out.println("Callback query received");
-            String funFact = getRandomFunFact(data); // Get fact based on the clicked button
-            sendText(userId, "Here is your fun fact: \n" + funFact);
+            // Handle the button click from the inline keyboard
+            handleCallbackQuery(update.getCallbackQuery());
         }
+    }
+    private void handleCallbackQuery(CallbackQuery callbackQuery) {
+        var userId = callbackQuery.getFrom().getId();
+        var data = callbackQuery.getData();  // This is the callback data sent by button clicks
 
+        System.out.println("Callback query received: " + data);
 
-
+        // Fetch and send the fact based on the button clicked
+        String funFact = getRandomFunFact(data);
+        sendText(userId, "Here is your " + data + " fun fact: \n" + funFact);
     }
     private void handleTextMessages(Message msg, Long id){
         if (msg.getText().equals("/fact")) {
@@ -153,7 +158,7 @@ public class Bot extends TelegramLongPollingBot {
             sql = "SELECT fact FROM fun_facts ORDER BY RANDOM() LIMIT 1";
         } else {
             // Select a random fun fact with a specific fact type
-            sql = "SELECT fact FROM fun_facts WHERE fact_type = ? ORDER BY RANDOM() LIMIT 1";
+            sql = "SELECT fact FROM fun_facts WHERE fact_type = ? and shown = 0 ORDER BY RANDOM() LIMIT 1";
         }
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:facts.sqlite");
