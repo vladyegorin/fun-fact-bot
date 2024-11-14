@@ -154,30 +154,57 @@ public class Bot extends TelegramLongPollingBot {
         String sql;
 
         if ("random".equals(factType)) {
-            // Select any random fun fact
-            sql = "SELECT fact FROM fun_facts ORDER BY RANDOM() LIMIT 1";
+            //choose random unshown fact
+            sql = "SELECT fact FROM fun_facts WHERE shown = 0 ORDER BY RANDOM() LIMIT 1";
         } else {
-            // Select a random fun fact with a specific fact type
-            sql = "SELECT fact FROM fun_facts WHERE fact_type = ? and shown = 0 ORDER BY RANDOM() LIMIT 1";
+            //choose specific unshown fact with a specific fact_type
+            sql = "SELECT fact FROM fun_facts WHERE fact_type = ? AND shown = 0 ORDER BY RANDOM() LIMIT 1";
         }
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:facts.sqlite");
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             if (!"random".equals(factType)) {
-                pstmt.setString(1, factType);  // Set the fact_type if it's not random
+                pstmt.setString(1, factType);
             }
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 funFact = rs.getString("fact");
+
+
+                String updateSql = "UPDATE fun_facts SET shown = 1 WHERE fact = ?"; //mark fact as shown
+                try (PreparedStatement updatePstmt = conn.prepareStatement(updateSql)) {
+                    updatePstmt.setString(1, funFact);
+                    updatePstmt.executeUpdate();
+                }
+            } else {
+                // if all facts of a certain type got shown, reset the shown column
+                String resetSql;
+                if ("random".equals(factType)) {
+                    resetSql = "UPDATE fun_facts SET shown = 0";  // reset all facts if random is selected
+                } else {
+                    resetSql = "UPDATE fun_facts SET shown = 0 WHERE fact_type = ?";  // reset shown for specific type
+                }
+
+                try (PreparedStatement resetPstmt = conn.prepareStatement(resetSql)) {
+                    if (!"random".equals(factType)) {
+                        resetPstmt.setString(1, factType);
+                    }
+                    resetPstmt.executeUpdate();
+                }
+
+                // Retry fetching the fact after reset
+                return getRandomFunFact(factType);
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return funFact;
     }
+
     //}
 
     public void copyMessage(Long who, Integer msgId){
