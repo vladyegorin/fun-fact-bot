@@ -9,12 +9,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.*;
 import java.util.List;
 import java.util.Properties;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Random;
 
 public class Bot extends TelegramLongPollingBot {
@@ -139,45 +136,35 @@ public class Bot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
-    private String getRandomFunFact() {
+    private String getRandomFunFact(String factType) {
         String funFact = "No fun fact available.";
+        String sql;
+
+        if ("random".equals(factType)) {
+            // Select any random fun fact
+            sql = "SELECT fact FROM fun_facts ORDER BY RANDOM() LIMIT 1";
+        } else {
+            // Select a random fun fact with a specific fact type
+            sql = "SELECT fact FROM fun_facts WHERE fact_type = ? ORDER BY RANDOM() LIMIT 1";
+        }
+
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:facts.sqlite");
-             Statement stmt = conn.createStatement()) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-
-            String countQuery = "SELECT COUNT(*) AS count FROM fun_facts WHERE shown = 0";
-            ResultSet countRs = stmt.executeQuery(countQuery);
-            int unshownCount = 0;
-            if (countRs.next()) {
-                unshownCount = countRs.getInt("count");
+            if (!"random".equals(factType)) {
+                pstmt.setString(1, factType);  // Set the fact_type if it's not random
             }
 
-            // If all facts have been shown, reset the `shown` column
-            if (unshownCount == 0) {
-                String resetQuery = "UPDATE fun_facts SET shown = 0";
-                stmt.executeUpdate(resetQuery);
-            }
-
-            // Select a random unshown fact
-            String sql = "SELECT fact FROM fun_facts WHERE shown = 0 ORDER BY RANDOM() LIMIT 1";
-            ResultSet rs = stmt.executeQuery(sql);
+            ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 funFact = rs.getString("fact");
-
-                // Mark the fact as shown
-                String updateQuery = "UPDATE fun_facts SET shown = 1 WHERE fact = ?";
-                try (var pstmt = conn.prepareStatement(updateQuery)) {
-                    pstmt.setString(1, funFact);
-                    pstmt.executeUpdate();
-                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return funFact;
     }
-    //private void userAddFunFact(String fact){
-
     //}
 
     public void copyMessage(Long who, Integer msgId){
