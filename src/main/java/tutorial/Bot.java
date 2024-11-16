@@ -1,5 +1,6 @@
 package tutorial;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.CopyMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -23,7 +24,6 @@ public class Bot extends TelegramLongPollingBot {
     private InlineKeyboardButton plants = InlineKeyboardButton.builder().text("Plant Fun Fact").callbackData("plant").build();
     private InlineKeyboardButton randomFF = InlineKeyboardButton.builder().text("Random Fun Fact").callbackData("random").build();
     private InlineKeyboardMarkup keyboardFactType = InlineKeyboardMarkup.builder().keyboardRow(List.of(animal)).keyboardRow(List.of(human)).keyboardRow(List.of(plants)).keyboardRow(List.of(randomFF)).build();
-
 
     public Bot() {
         // Load properties from config file
@@ -68,11 +68,15 @@ public class Bot extends TelegramLongPollingBot {
 
         if (update.hasCallbackQuery()) {
             // Handle the button click from the inline keyboard
-            handleCallbackQuery(update.getCallbackQuery());
+            try {
+                handleCallbackQuery(update.getCallbackQuery());
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    private void handleCallbackQuery(CallbackQuery callbackQuery) {
+    private void handleCallbackQuery(CallbackQuery callbackQuery) throws TelegramApiException {
         var userId = callbackQuery.getFrom().getId();
         var data = callbackQuery.getData();  // This is the callback data sent by button clicks
 
@@ -81,6 +85,11 @@ public class Bot extends TelegramLongPollingBot {
         // Fetch and send the fact based on the button clicked
         String funFact = getRandomFunFact(data);
         sendText(userId, "Here is your " + data + " fun fact: \n" + funFact);
+        AnswerCallbackQuery close = AnswerCallbackQuery.builder()
+                .callbackQueryId(callbackQuery.getId()).build();
+
+        execute(close);
+
     }
 
     private void handleTextMessages(Message msg, Long id){
