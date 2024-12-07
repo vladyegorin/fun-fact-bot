@@ -18,12 +18,16 @@ import java.util.Properties;
 
 public class Bot extends TelegramLongPollingBot {
     private String botToken;
-    private String state;
-    private InlineKeyboardButton animal = InlineKeyboardButton.builder().text("Animal Fun Fact").callbackData("animal").build();
-    private InlineKeyboardButton human = InlineKeyboardButton.builder().text("Human Fun Fact").callbackData("human").build();
-    private InlineKeyboardButton plants = InlineKeyboardButton.builder().text("Plant Fun Fact").callbackData("plant").build();
-    private InlineKeyboardButton randomFF = InlineKeyboardButton.builder().text("Random Fun Fact").callbackData("random").build();
-    private InlineKeyboardMarkup keyboardFactType = InlineKeyboardMarkup.builder().keyboardRow(List.of(animal)).keyboardRow(List.of(human)).keyboardRow(List.of(plants)).keyboardRow(List.of(randomFF)).build();
+    private final InlineKeyboardButton animal = InlineKeyboardButton.builder().text("Animal Fun Fact").callbackData("animal").build();
+    private final InlineKeyboardButton human = InlineKeyboardButton.builder().text("Human Fun Fact").callbackData("human").build();
+    private final InlineKeyboardButton plants = InlineKeyboardButton.builder().text("Plant Fun Fact").callbackData("plant").build();
+    private final InlineKeyboardButton randomFF = InlineKeyboardButton.builder().text("Random Fun Fact").callbackData("random").build();
+    private final InlineKeyboardMarkup keyboardFactType = InlineKeyboardMarkup.builder().
+            keyboardRow(List.of(animal)).
+            keyboardRow(List.of(human)).
+            keyboardRow(List.of(plants)).
+            keyboardRow(List.of(randomFF)).
+            build();
 
     public Bot() {
         // Load properties from config file
